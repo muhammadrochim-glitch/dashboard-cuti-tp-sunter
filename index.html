@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex,nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboard Cuti Operator – Transit Point Sunter DC</title>
+<style>
+:root{
+  --bg:#f4f6f9;--card:#fff;--ink:#1d2433;--muted:#667085;--line:#e4e7ec;
+  --brand:#ee4d2d;--brand-d:#c93c20;--brand-l:#fff1ed;
+  --ok:#12805c;--ok-l:#e7f6ef;--warn:#b54708;--warn-l:#fef4e6;--bad:#b42318;--bad-l:#fdecea;
+  --cobra:#D55E00;--viper:#0072B2;--python:#009E73;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--ink);font-size:14px}
+header{background:#fff;border-bottom:1px solid var(--line);padding:14px 24px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.logo{width:40px;height:40px;border-radius:10px;background:var(--brand);color:#fff;display:grid;place-items:center;font-weight:700;font-size:15px}
+header h1{font-size:18px;margin:0}
+header .sub{color:var(--muted);font-size:12.5px}
+header .today{margin-left:auto;text-align:right;font-size:12.5px;color:var(--muted)}
+header .today b{display:block;color:var(--ink);font-size:14px}
+main{max-width:1280px;margin:0 auto;padding:18px 20px 40px}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+.tcard{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;cursor:pointer;transition:.15s;border-top:4px solid var(--c,#98a2b3)}
+.tcard:hover{box-shadow:0 2px 10px rgba(16,24,40,.08)}
+.tcard.active{outline:2px solid var(--c,#98a2b3)}
+.tcard .nm{font-weight:700;font-size:15px;display:flex;justify-content:space-between;align-items:center}
+.tcard .nm small{font-weight:500;color:var(--muted);font-size:12px}
+.tcard .row{display:flex;gap:14px;margin-top:10px}
+.tcard .row div{flex:1}
+.tcard .v{font-size:20px;font-weight:700}
+.tcard .l{font-size:11.5px;color:var(--muted)}
+.bar{height:6px;background:#eef0f3;border-radius:6px;margin-top:10px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--c,#98a2b3)}
+.tabs{display:flex;gap:6px;border-bottom:1px solid var(--line);margin-bottom:16px;flex-wrap:wrap}
+.tab{padding:10px 16px;border:none;background:none;font:inherit;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-1px}
+.tab.active{color:var(--brand);border-bottom-color:var(--brand)}
+.tab .cnt{background:var(--brand-l);color:var(--brand);border-radius:10px;padding:1px 7px;font-size:11.5px;margin-left:4px}
+.panel{display:none}.panel.active{display:block}
+.box{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px}
+.box h2{font-size:16px;margin:0 0 4px}
+.box .hint{color:var(--muted);font-size:12.5px;margin:0 0 14px}
+.grid2{display:grid;grid-template-columns:1.45fr 1fr;gap:16px;align-items:start}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px 14px}
+.full{grid-column:1/-1}
+label{display:block;font-weight:600;font-size:12.5px;margin-bottom:5px}
+label .req{color:var(--bad)}
+input,select,textarea{width:100%;padding:9px 11px;border:1px solid #d0d5dd;border-radius:8px;font:inherit;background:#fff;color:var(--ink)}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px rgba(238,77,45,.15)}
+input[readonly]{background:#f9fafb}
+textarea{resize:vertical;min-height:70px}
+.err{color:var(--bad);font-size:12px;margin-top:4px;display:none}
+.invalid input,.invalid select,.invalid textarea{border-color:var(--bad)}
+.invalid .err{display:block}
+.btn{border:1px solid #d0d5dd;background:#fff;color:var(--ink);padding:8px 14px;border-radius:8px;font:inherit;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.btn:hover{background:#f9fafb}
+.btn.primary{background:var(--brand);border-color:var(--brand);color:#fff}
+.btn.primary:hover{background:var(--brand-d)}
+.btn.sm{padding:4px 9px;font-size:12px;border-radius:6px}
+.btn.ok{color:var(--ok);border-color:#a6dcc4}.btn.ok:hover{background:var(--ok-l)}
+.btn.bad{color:var(--bad);border-color:#f4b9b2}.btn.bad:hover{background:var(--bad-l)}
+.actions{display:flex;gap:8px;justify-content:flex-end;margin-top:16px;flex-wrap:wrap}
+/* combobox */
+.combo{position:relative}
+.combo .list{position:absolute;z-index:20;top:100%;left:0;right:0;background:#fff;border:1px solid #d0d5dd;border-radius:8px;margin-top:4px;max-height:280px;overflow:auto;box-shadow:0 8px 24px rgba(16,24,40,.12);display:none}
+.combo .list.open{display:block}
+.combo .opt{padding:8px 11px;cursor:pointer;display:flex;justify-content:space-between;gap:8px;border-bottom:1px solid #f2f4f7}
+.combo .opt:hover,.combo .opt.hl{background:var(--brand-l)}
+.combo .opt small{color:var(--muted)}
+.combo .empty{padding:10px;color:var(--muted)}
+.chip{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11.5px;font-weight:600;white-space:nowrap}
+.t-Cobra{background:#fbeee6;color:#a8470a}.t-Viper{background:#e6f1f8;color:#005a8c}.t-Python{background:#e5f5f0;color:#00704f}
+.s-Menunggu{background:var(--warn-l);color:var(--warn)}.s-Disetujui{background:var(--ok-l);color:var(--ok)}.s-Ditolak{background:var(--bad-l);color:var(--bad)}
+.jn{background:#f2f4f7;color:#344054}
+.side .sec{border-top:1px solid var(--line);padding-top:12px;margin-top:12px}
+.side .sec:first-of-type{border-top:none;padding-top:0;margin-top:0}
+.side h3{font-size:13.5px;margin:0 0 8px}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:13px}
+.kv span{color:var(--muted)}
+.quota{display:flex;gap:10px;margin-top:8px}
+.quota div{flex:1;background:#f9fafb;border:1px solid var(--line);border-radius:8px;padding:8px;text-align:center}
+.quota b{display:block;font-size:18px}
+.quota small{color:var(--muted);font-size:11px}
+.alert{padding:9px 12px;border-radius:8px;font-size:12.5px;margin-top:8px}
+.alert.warn{background:var(--warn-l);color:var(--warn)}
+.alert.bad{background:var(--bad-l);color:var(--bad)}
+.alert.ok{background:var(--ok-l);color:var(--ok)}
+.muted{color:var(--muted)}
+ul.mini{margin:6px 0 0;padding-left:18px;font-size:12.5px}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center}
+.filters input,.filters select{width:auto;min-width:130px}
+.filters .grow{flex:1;min-width:200px}
+.tablewrap{overflow:auto;border:1px solid var(--line);border-radius:10px}
+table{width:100%;border-collapse:collapse;font-size:13px;background:#fff}
+th{background:#f9fafb;text-align:left;padding:9px 10px;font-size:12px;color:#475467;border-bottom:1px solid var(--line);white-space:nowrap;position:sticky;top:0}
+td{padding:8px 10px;border-bottom:1px solid #f2f4f7;vertical-align:middle}
+tr:hover td{background:#fcfcfd}
+td.num,th.num{text-align:right}
+td .rowact{display:flex;gap:4px;flex-wrap:wrap}
+.emptyrow td{text-align:center;color:var(--muted);padding:30px}
+.foot{display:flex;justify-content:space-between;align-items:center;margin-top:10px;color:var(--muted);font-size:12.5px;flex-wrap:wrap;gap:8px}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);background:#1d2433;color:#fff;padding:10px 16px;border-radius:8px;opacity:0;transition:.25s;z-index:99;display:flex;gap:12px;align-items:center;font-size:13px}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast button{background:none;border:none;color:#fda29b;font-weight:700;cursor:pointer;font:inherit}
+.editing-banner{display:none;background:var(--warn-l);color:var(--warn);padding:8px 12px;border-radius:8px;margin-bottom:12px;font-size:13px}
+.editing-banner.on{display:flex;justify-content:space-between;align-items:center}
+.settings{display:flex;gap:8px;align-items:center;font-size:12.5px;color:var(--muted)}
+.settings input{width:70px;padding:5px 8px}
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:16px}
+.kpi{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.kpi .l{font-size:12px;color:var(--muted);font-weight:600}
+.kpi .v{font-size:28px;font-weight:700;margin-top:4px;line-height:1.1}
+.kpi .s{font-size:12px;color:var(--muted);margin-top:4px}
+.dgrid{display:grid;grid-template-columns:1.25fr 1fr;gap:16px;margin-bottom:16px;align-items:start}
+.box h2 .tag{font-weight:500;color:var(--muted);font-size:12.5px;margin-left:6px}
+.legend{display:flex;gap:16px;font-size:12px;color:#475467;margin:2px 0 6px;flex-wrap:wrap}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.chart{min-width:0;overflow-x:auto;overflow-y:hidden}.chart svg{display:block;overflow:visible}
+.chart .col:hover{fill:rgba(16,24,40,.05)}
+.hb{display:grid;grid-template-columns:minmax(110px,190px) 1fr 44px;gap:8px;align-items:center;font-size:12.5px;padding:4px 0}
+.hb .lb{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hb .tr{height:12px;background:#f2f4f7;border-radius:4px;overflow:hidden}
+.hb .tr i{display:block;height:100%;border-radius:0 4px 4px 0}
+.hb .vl{text-align:right;font-weight:600}
+.hb:hover .lb{color:var(--brand)}
+#tip{position:fixed;pointer-events:none;background:#1d2433;color:#fff;font-size:12px;padding:8px 10px;border-radius:6px;z-index:100;display:none;max-width:280px;line-height:1.5;box-shadow:0 6px 18px rgba(0,0,0,.2)}
+#tip b{font-size:12.5px}
+.dot{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:6px}
+.banner{background:#fff;border:1px dashed #f0a28f;border-radius:12px;padding:14px 16px;margin-bottom:16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.banner.demo{border-style:solid;border-color:#fcd9a8;background:var(--warn-l)}
+.banner .txt{flex:1;min-width:240px;font-size:13px}
+.viewdate{display:flex;align-items:center;gap:8px;margin-left:auto;font-size:12.5px;color:var(--muted)}
+.viewdate input{width:auto;padding:6px 9px}
+.scroll{max-height:330px;overflow:auto}
+.impres{font-size:12.5px;margin-top:8px}
+.dgrid>*,.grid2>*,.kpis>*,.cards>*{min-width:0}
+@media (max-width:560px){header .viewdate{margin-left:0}.kpis{grid-template-columns:1fr 1fr}.kpi .v{font-size:22px}.tcard .row{gap:6px}.tcard .v{font-size:17px}main{padding:14px 10px 30px}}
+@media (max-width:1000px){.kpis{grid-template-columns:repeat(2,1fr)}.dgrid{grid-template-columns:1fr}}
+@media (max-width:900px){.cards{grid-template-columns:repeat(2,1fr)}.grid2{grid-template-columns:1fr}.fgrid{grid-template-columns:1fr}}
+@media print{
+  header .today,.tabs,.cards,.filters,.actions,.noprint,td .rowact,th.act,td.act{display:none!important}
+  body{background:#fff}.box{border:none;padding:0}.panel{display:none!important}#p-list{display:block!important}
+  .print-title{display:block!important}
+}
+.print-title{display:none;margin-bottom:8px}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">SPX</div>
+  <div>
+    <h1>Dashboard Cuti Operator</h1>
+    <div class="sub">Transit Point Sunter DC · 3 team · <span id="hdrTotal"></span> operator</div>
+  </div>
+  <div class="viewdate"><span>Tanggal pantau</span><input type="date" id="viewDate"><button class="btn sm" id="btnToday">Hari ini</button></div>
+</header>
+
+<main>
+  <div class="cards" id="cards"></div>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="dash">📊 Dashboard</button>
+    <button class="tab" data-tab="form">📝 Form Cuti</button>
+    <button class="tab" data-tab="list">📋 List Cuti <span class="cnt" id="cntList">0</span></button>
+    <button class="tab" data-tab="ops">👥 Data Operator</button>
+  </div>
+
+  <!-- DASHBOARD -->
+  <section class="panel active" id="p-dash">
+    <div id="dashBanner"></div>
+    <div class="kpis" id="kpis"></div>
+    <div class="dgrid">
+      <div class="box">
+        <h2>Operator cuti <span class="tag" id="todayTag"></span></h2>
+        <p class="hint">Termasuk pengajuan yang masih menunggu. Pengajuan ditolak tidak dihitung.</p>
+        <div class="scroll tablewrap"><table><thead><tr><th>Nama</th><th>Ops ID</th><th>Team</th><th>Jenis</th><th>Periode</th><th>Status</th></tr></thead><tbody id="dToday"></tbody></table></div>
+      </div>
+      <div class="box">
+        <h2>Ketersediaan per team <span class="tag" id="availTag"></span></h2>
+        <p class="hint">Operator yang tidak sedang cuti dibanding total operator tiap team.</p>
+        <div id="dAvail"></div>
+      </div>
+    </div>
+    <div class="box" style="margin-bottom:16px">
+      <h2>Jumlah operator cuti · 14 hari ke depan</h2>
+      <p class="hint">Dihitung per hari dari pengajuan disetujui dan menunggu. Arahkan kursor ke batang untuk rincian.</p>
+      <div class="legend" id="lg14"></div>
+      <div class="chart" id="c14"></div>
+    </div>
+    <div class="dgrid">
+      <div class="box">
+        <h2>Hari cuti per bulan <span class="tag" id="yearTag"></span></h2>
+        <p class="hint">Total hari cuti yang disetujui, dipisah per team.</p>
+        <div class="legend" id="lgMon"></div>
+        <div class="chart" id="cMon"></div>
+      </div>
+      <div class="box">
+        <h2>Hari cuti per jenis <span class="tag" id="yearTag2"></span></h2>
+        <p class="hint">Hanya pengajuan yang disetujui.</p>
+        <div id="cJenis"></div>
+        <h2 style="margin-top:18px">10 operator dengan hari cuti terbanyak</h2>
+        <p class="hint">Hari cuti disetujui pada tahun yang sama.</p>
+        <div id="cTop"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FORM -->
+  <section class="panel" id="p-form">
+    <div class="grid2">
+      <div class="box">
+        <div class="editing-banner" id="editBanner"><span>✏️ Sedang mengubah data cuti <b id="editWho"></b></span><button class="btn sm" id="btnCancelEdit">Batal ubah</button></div>
+        <h2>Pengajuan Cuti Operator</h2>
+        <p class="hint">Pilih operator dari data Transit Point Sunter DC. Team dan Ops ID terisi otomatis.</p>
+        <form id="frm" novalidate autocomplete="off">
+          <div class="fgrid">
+            <div class="full" data-f="op">
+              <label>Nama Operator / Ops ID <span class="req">*</span></label>
+              <div class="combo">
+                <input id="opSearch" placeholder="Ketik nama atau Ops ID…">
+                <div class="list" id="opList"></div>
+              </div>
+              <div class="err">Pilih operator dari daftar.</div>
+            </div>
+            <div><label>Ops ID</label><input id="fOps" readonly placeholder="—"></div>
+            <div><label>Team</label><input id="fTeam" readonly placeholder="—"></div>
+            <div data-f="jenis">
+              <label>Jenis Cuti <span class="req">*</span></label>
+              <select id="fJenis">
+                <option value="">— Pilih —</option>
+                <option>Cuti Tahunan</option>
+                <option>Sakit</option>
+                <option>Izin</option>
+                <option>Cuti Khusus</option>
+                <option>Cuti Melahirkan</option>
+                <option>Cuti Tanpa Gaji</option>
+              </select>
+              <div class="err">Pilih jenis cuti.</div>
+            </div>
+            <div data-f="status">
+              <label>Status</label>
+              <select id="fStatus"><option>Menunggu</option><option>Disetujui</option><option>Ditolak</option></select>
+            </div>
+            <div data-f="mulai">
+              <label>Tanggal Mulai <span class="req">*</span></label>
+              <input type="date" id="fMulai">
+              <div class="err" id="errMulai">Isi tanggal mulai.</div>
+            </div>
+            <div data-f="selesai">
+              <label>Tanggal Selesai <span class="req">*</span></label>
+              <input type="date" id="fSelesai">
+              <div class="err" id="errSelesai">Isi tanggal selesai.</div>
+            </div>
+            <div><label>Jumlah Hari</label><input id="fHari" readonly placeholder="0"></div>
+            <div><label>No. HP yang bisa dihubungi</label><input id="fHp" inputmode="tel" placeholder="08xx…"></div>
+            <div class="full" data-f="alasan">
+              <label>Alasan / Keterangan <span class="req">*</span></label>
+              <textarea id="fAlasan" placeholder="Contoh: acara keluarga, sakit demam (ada surat dokter), dll."></textarea>
+              <div class="err">Isi alasan cuti.</div>
+            </div>
+            <div class="full"><label>Disetujui / Diketahui oleh (Leader/SPV)</label><input id="fAtasan" placeholder="Nama leader atau supervisor"></div>
+          </div>
+          <div class="actions">
+            <button type="button" class="btn" id="btnReset">Kosongkan</button>
+            <button type="submit" class="btn primary" id="btnSubmit">Simpan ke List Cuti</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="box side" id="side">
+        <div class="sec" id="sideOp"><h3>Info Operator</h3><p class="muted" style="margin:0">Pilih operator untuk melihat riwayat dan sisa cuti tahunan.</p></div>
+        <div class="sec" id="sideTeam"><h3>Dampak ke Team</h3><p class="muted" style="margin:0">Isi operator dan tanggal untuk melihat siapa saja rekan satu team yang juga cuti.</p></div>
+        <div class="sec">
+          <div class="settings">Kuota cuti tahunan: <input type="number" id="setQuota" min="0" max="365"> hari / operator / tahun</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LIST -->
+  <section class="panel" id="p-list">
+    <div class="box">
+      <div class="print-title"><h2>List Cuti Operator – Transit Point Sunter DC</h2><div class="muted" id="printInfo"></div></div>
+      <div class="filters">
+        <input class="grow" id="lq" placeholder="🔍 Cari nama / Ops ID / alasan…">
+        <select id="lTeam"><option value="">Semua team</option></select>
+        <select id="lJenis"><option value="">Semua jenis</option></select>
+        <select id="lStatus"><option value="">Semua status</option><option>Menunggu</option><option>Disetujui</option><option>Ditolak</option></select>
+        <input type="month" id="lBulan" title="Filter bulan">
+        <button class="btn sm" id="lClear">Reset filter</button>
+      </div>
+      <div class="tablewrap">
+        <table>
+          <thead><tr>
+            <th>No</th><th>Ops ID</th><th>Nama</th><th>Team</th><th>Jenis</th><th>Mulai</th><th>Selesai</th><th class="num">Hari</th><th>Alasan</th><th>Status</th><th class="act">Aksi</th>
+          </tr></thead>
+          <tbody id="lBody"></tbody>
+        </table>
+      </div>
+      <div class="foot">
+        <span id="lInfo"></span>
+        <div class="actions noprint" style="margin:0">
+          <button class="btn" id="btnXlsx">⬇ Export Excel</button>
+          <button class="btn" id="btnPrint">🖨 Cetak</button>
+          <button class="btn" id="btnBackup" title="Simpan semua data ke file cadangan">💾 Backup</button>
+          <button class="btn" id="btnRestore" title="Muat data dari file cadangan">📂 Restore</button>
+          <input type="file" id="fileRestore" accept=".json" hidden>
+          <button class="btn" onclick="document.getElementById('fileImport').click()">⬆ Import FMS</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- OPERATOR -->
+  <section class="panel" id="p-ops">
+    <div class="box">
+      <h2>Data Operator</h2>
+      <p class="hint">Sumber: DATA OPERATOR TRANSIT POINT SUNTER DC.xlsx. Hari cuti dihitung dari pengajuan berstatus Disetujui pada tahun berjalan.</p>
+      <div class="filters">
+        <input class="grow" id="oq" placeholder="🔍 Cari nama / Ops ID…">
+        <select id="oTeam"><option value="">Semua team</option></select>
+        <select id="oStat"><option value="">Semua kondisi (tgl pantau)</option><option value="cuti">Sedang cuti</option><option value="hadir">Tidak cuti</option></select>
+      </div>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>No</th><th>Ops ID</th><th>Nama</th><th>Team</th><th class="num">Cuti Tahunan</th><th class="num">Sisa Kuota</th><th class="num">Total Hari Cuti</th><th>Tgl Pantau</th><th class="act">Aksi</th></tr></thead>
+          <tbody id="oBody"></tbody>
+        </table>
+      </div>
+      <div class="foot"><span id="oInfo"></span></div>
+    </div>
+  </section>
+</main>
+
+<div class="toast" id="toast"><span id="toastMsg"></span><button id="toastUndo" hidden>Urungkan</button></div>
+
+<script>
+/* ====== DATA OPERATOR (dari file Excel) ====== */
+const OPS_RAW = [["Ops223107","Aditya Pratama Sumarna","Cobra"],["Ops1456364","Julian Putra","Viper"],["Ops1456362","Fahmi Adam","Viper"],["Ops1456377","Satrio Wicaksono","Viper"],["Ops1456355","Ahmad Renaldi","Viper"],["Ops1456386","Muhammad Aldi Sobirin","Viper"],["Ops1456337","Romli Bagas Pasonang","Viper"],["OPS625113","MIFTAHUL JANNAH","Viper"],["Ops1456353","Muhammad Farhannudin","Viper"],["Ops1456394","Dwi Fitrah Hudinsyah","Viper"],["Ops1456368","MUHAMMAD ALWI RIDWANSYAH","Viper"],["Ops264476","Artanada","Viper"],["Ops1456366","MUHAMAD RAFLI","Viper"],["Ops1059191","Fauzie Indra Fadillah","Viper"],["Ops1456369","Ikhsan Aryadita","Viper"],["Ops1456360","Atala Ardiansyah Daniswara","Viper"],["Ops1456396","Ahmad Imam Ali Said","Viper"],["Ops1456397","Muhammad Andi Yansah","Viper"],["Ops1456392","Zulfikar","Viper"],["Ops1456381","Kusumah Hatta","Viper"],["Ops1465261","Robiul Awal","Viper"],["Ops1456380","Muhammad Fajar Febriansyah","Viper"],["Ops1456357","M Jafar Sidik","Viper"],["Ops1456395","Mussidik","Viper"],["Ops1456356","Muh Ripan Hamzah","Viper"],["Ops1456358","Tia Adiana","Viper"],["Ops1456359","Filma Yida Lesmana","Viper"],["Ops1456372","Sabar Jumadi","Viper"],["Ops1456371","Welly Wangkimura","Viper"],["Ops1456367","Alfajr Zepaherzrvic","Viper"],["Ops1456363","Raihan Putra Buana","Viper"],["Ops1456543","Sapto Kusumo Hadi","Viper"],["Ops1456361","Yunus Fajar Setiawan","Viper"],["Ops1456352","Noval Ibrahim","Viper"],["Ops1456384","Fahri Husaini","Viper"],["OPS1456409","Joni Agustiawan","Viper"],["Ops1580","M Fajar","Python"],["Ops303110","Jeffry Tirta Putra","Python"],["Ops507619","Firman Nur Hidayah","Python"],["Ops212701","Hery","Python"],["Ops1456378","Alfian Ramadhan Akhta","Python"],["Ops205078","Faisal Hafidfudin","Python"],["Ops1059168","Aji Lukman Hakim","Python"],["Ops1059222","Ibnu Rianto","Python"],["Ops1059164","Al Hadi","Python"],["Ops493653","MOHAMMAD MASRURI","Python"],["Ops1456383","ARIF HIDAYAT","Python"],["Ops1059169","KARMAN","Python"],["Ops1059273","Ahmad Seihu","Python"],["Ops1059176","Mirdan Maulana","Python"],["Ops1465256","Hasballah","Python"],["Ops1456344","Arief Hidayat","Python"],["Ops1456387","Muhammad Deni Syaputra","Python"],["Ops1456388","Rahman Maulana","Python"],["Ops1475233","Muhammad Rival Alfa Rizhi Setiawan","Python"],["Ops1456370","Muhammad Irfan","Python"],["Ops1456390","Fathur Rohman","Python"],["OPS1465258","Rian Subastian","Python"],["Ops1456393","Saiful Bahri","Python"],["Ops1456346","Agung Maipulah","Python"],["Ops1456339","Ridho Putra Akbar","Python"],["Ops1456342","Dio Wira Permana","Python"],["Ops1456343","Darman","Python"],["Ops1456376","Mirta","Python"],["Ops1456348","Raka Hilman Nurrachman","Python"],["Ops1456350","Willan Putra Gowinatha","Python"],["Ops1456349","Yadi Mulyana","Python"],["Ops1465257","Andika Ramdani","Python"],["Ops1465260","Ghaly Adytia Saputra","Python"],["Ops1475232","Moh Hasbi Taufik","Python"],["Ops1456373","Soim Fajar","Python"],["Ops1456389","Muhammad Mulyadin Alfiansyah","Python"],["Ops196","Irvane Maradona J Yusti","Cobra"],["OPS567930","Komarudin","Cobra"],["OPS333121","Hermansyah","Cobra"],["OPS1456404","Achmad Bachtiar","Cobra"],["Ops1456385","Muhamad Bastian Adi Putra","Cobra"],["Ops1456405","Fajar Gemilang","Cobra"],["OPS1456414","Muhammad Taufiqur","Cobra"],["OPS1456413","Dava Fanel Pratama","Cobra"],["Ops223548","Arun Saputra Haysu","Cobra"],["Ops1456417","SATRIO NUR MULIADIN","Cobra"],["Ops1456412","RAYNALDIANSYAH","Cobra"],["OPS1456420","Riyan Hidayat","Cobra"],["Ops1456399","Ahmad Payumi","Cobra"],["Ops618815","Rizki Sunaryadi","Cobra"],["Ops1456401","Randy Fimansyah","Cobra"],["OPS1456402","Beril Amri Dwi Cahya","Cobra"],["OPS1456408","Adi Purnomo","Cobra"],["OPS1456406","Rahma Yudi Saputra","Cobra"],["Ops1456410","Sopian Efendi","Cobra"],["Ops1456382","Muhammad Afdal Firdaus","Cobra"],["Ops1456391","Tri Saputra","Cobra"],["OPS1456403","Ahmad Fadli","Cobra"],["Ops1456351","Reva Adji Prasetya","Cobra"],["OPS1456411","Ahmad Farid","Cobra"],["OPS1456415","Toif Ali Hasim","Cobra"],["Ops1456400","Aditya Kartasasmita","Cobra"],["Ops1465255","Muhammad Tio Kartiko","Cobra"],["Ops1456365","Refan","Cobra"],["OPS1456407","Muhammad Firman Saputro","Cobra"],["Ops789932","Desta Teguh Meidana","Cobra"],["OPS1456418","Toby Anggoro Saputra","Cobra"],["OPS1466021","Muhammad Farid","Cobra"],["OPS1475235","Leonardo Fransiskus","Cobra"],["OPS1466020","Muhammad Ibrahim Hasan","Cobra"],["OPS1475234","Ahmad Sirofudin","Cobra"],["OPS1465259","Nurawaludin","Cobra"]];
+const OPS = OPS_RAW.map(([ops,nama,team])=>({ops,nama,team}));
+const TEAMS = ['Cobra','Viper','Python'];
+const TEAM_COLOR = {Cobra:'var(--cobra)',Viper:'var(--viper)',Python:'var(--python)'};
+const TEAM_HEX = {Cobra:'#D55E00',Viper:'#0072B2',Python:'#009E73'};
+const JENIS = ['Cuti Tahunan','Sakit','Izin','Cuti Khusus','Cuti Melahirkan','Cuti Tanpa Gaji'];
+const KEY = 'listCutiSunterDC.v1';
+
+/* ====== STATE ====== */
+let store = load();
+function load(){
+  try{ const s = JSON.parse(localStorage.getItem(KEY)); if(s && Array.isArray(s.items)) return {quota:12,...s}; }catch(e){}
+  return {items:[],quota:12};
+}
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(store)); }catch(e){ toast('Gagal menyimpan ke browser.'); } }
+
+/* ====== UTIL ====== */
+const $ = s=>document.querySelector(s);
+const esc = s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const pad = n=>String(n).padStart(2,'0');
+const isoOf = d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const TODAY = isoOf(new Date());
+const YEAR = TODAY.slice(0,4);
+let VIEW = TODAY;
+const BLN = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+const HARI = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+function fmt(iso){ if(!iso) return '—'; const [y,m,d]=iso.split('-'); return `${+d} ${BLN[+m-1]} ${y}`; }
+function dayNum(iso){ const [y,m,d]=iso.split('-').map(Number); return Date.UTC(y,m-1,d)/864e5; }
+function days(a,b){ return dayNum(b)-dayNum(a)+1; }
+function overlap(a1,a2,b1,b2){ return a1<=b2 && b1<=a2; }
+function daysInYear(it,year){ // hari cuti yang jatuh di tahun tsb
+  const s = it.mulai < `${year}-01-01` ? `${year}-01-01` : it.mulai;
+  const e = it.selesai > `${year}-12-31` ? `${year}-12-31` : it.selesai;
+  return s<=e ? days(s,e) : 0;
+}
+const opByOps = Object.fromEntries(OPS.map(o=>[o.ops,o]));
+const uid = ()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const teamChip = t=>`<span class="chip t-${esc(t)}">${esc(t)}</span>`;
+const statChip = s=>`<span class="chip s-${esc(s)}">${esc(s)}</span>`;
+
+let toastTimer, undoFn=null;
+function toast(msg, undo){
+  $('#toastMsg').textContent = msg; undoFn = undo||null;
+  $('#toastUndo').hidden = !undo;
+  $('#toast').classList.add('show'); clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>$('#toast').classList.remove('show'), undo?6000:3000);
+}
+$('#toastUndo').onclick = ()=>{ if(undoFn){ undoFn(); undoFn=null; } $('#toast').classList.remove('show'); };
+
+/* ====== QUERY HELPERS ====== */
+function onLeave(ops, iso){ return store.items.find(i=>i.ops===ops && i.status!=='Ditolak' && i.mulai<=iso && iso<=i.selesai); }
+function statsOp(ops){
+  const mine = store.items.filter(i=>i.ops===ops);
+  const appr = mine.filter(i=>i.status==='Disetujui');
+  const tahunan = appr.filter(i=>i.jenis==='Cuti Tahunan').reduce((a,i)=>a+daysInYear(i,YEAR),0);
+  const pendTahunan = mine.filter(i=>i.status==='Menunggu'&&i.jenis==='Cuti Tahunan').reduce((a,i)=>a+daysInYear(i,YEAR),0);
+  const total = appr.reduce((a,i)=>a+daysInYear(i,YEAR),0);
+  return {mine,tahunan,pendTahunan,total,sisa:store.quota-tahunan};
+}
+
+/* ====== HEADER & CARDS ====== */
+$('#hdrTotal').textContent = OPS.length;
+let teamFilter = '';
+function renderCards(){
+  const groups = [{name:'',label:'Semua Team',c:'#475467'}, ...TEAMS.map(t=>({name:t,label:'Team '+t,c:TEAM_COLOR[t]}))];
+  $('#cards').innerHTML = groups.map(g=>{
+    const ops = OPS.filter(o=>!g.name||o.team===g.name);
+    const cuti = ops.filter(o=>onLeave(o.ops,VIEW)).length;
+    const pend = store.items.filter(i=>i.status==='Menunggu' && (!g.name||i.team===g.name)).length;
+    const hadir = ops.length ? Math.round((ops.length-cuti)/ops.length*100) : 0;
+    return `<div class="tcard ${teamFilter===g.name?'active':''}" style="--c:${g.c}" data-team="${g.name}">
+      <div class="nm">${g.label}<small>${ops.length} operator</small></div>
+      <div class="row"><div><div class="v">${cuti}</div><div class="l">${VIEW===TODAY?'Cuti hari ini':'Cuti '+fmt(VIEW)}</div></div>
+      <div><div class="v">${pend}</div><div class="l">Menunggu</div></div>
+      <div><div class="v">${hadir}%</div><div class="l">Tersedia</div></div></div>
+      <div class="bar"><i style="width:${hadir}%"></i></div></div>`;
+  }).join('');
+  $('#cntList').textContent = store.items.length;
+}
+$('#cards').addEventListener('click',e=>{
+  const c = e.target.closest('.tcard'); if(!c) return;
+  teamFilter = c.dataset.team;
+  $('#lTeam').value = teamFilter; $('#oTeam').value = teamFilter;
+  renderAll();
+});
+
+/* ====== TABS ====== */
+function showTab(t){
+  document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===t));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active',p.id==='p-'+t));
+}
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>showTab(b.dataset.tab));
+
+/* ====== COMBOBOX OPERATOR ====== */
+let selOp = null, hl = -1, shown = [];
+const opSearch = $('#opSearch'), opList = $('#opList');
+function norm(s){ return s.toLowerCase().replace(/\s+/g,' ').trim(); }
+function filterOps(q){
+  q = norm(q);
+  if(!q) return OPS.slice();
+  const terms = q.split(' ');
+  return OPS.filter(o=>{ const h = norm(o.nama+' '+o.ops+' '+o.team); return terms.every(t=>h.includes(t)); });
+}
+function openList(){
+  shown = filterOps(opSearch.value); hl = shown.length?0:-1;
+  opList.innerHTML = shown.length ? shown.map((o,i)=>`<div class="opt ${i===hl?'hl':''}" data-i="${i}"><span>${esc(o.nama)} <small>· ${esc(o.ops)}</small></span>${teamChip(o.team)}</div>`).join('')
+    : '<div class="empty">Tidak ditemukan. Cek ejaan nama atau Ops ID.</div>';
+  opList.classList.add('open');
+}
+function closeList(){ opList.classList.remove('open'); }
+function pickOp(o){
+  selOp = o; opSearch.value = o.nama; $('#fOps').value = o.ops; $('#fTeam').value = o.team;
+  closeList(); setInvalid('op',false); updateSide();
+}
+opSearch.addEventListener('focus',openList);
+opSearch.addEventListener('input',()=>{ if(selOp && opSearch.value!==selOp.nama){ selOp=null; $('#fOps').value=''; $('#fTeam').value=''; updateSide(); } openList(); });
+opSearch.addEventListener('keydown',e=>{
+  if(!opList.classList.contains('open')) { if(e.key==='ArrowDown') openList(); return; }
+  if(e.key==='ArrowDown'||e.key==='ArrowUp'){ e.preventDefault(); if(!shown.length) return; hl=(hl+(e.key==='ArrowDown'?1:-1)+shown.length)%shown.length;
+    opList.querySelectorAll('.opt').forEach((el,i)=>el.classList.toggle('hl',i===hl)); opList.querySelector('.opt.hl')?.scrollIntoView({block:'nearest'}); }
+  else if(e.key==='Enter'){ e.preventDefault(); if(hl>=0&&shown[hl]) pickOp(shown[hl]); }
+  else if(e.key==='Escape'){ closeList(); }
+});
+opList.addEventListener('mousedown',e=>{ const el=e.target.closest('.opt'); if(el){ e.preventDefault(); pickOp(shown[+el.dataset.i]); } });
+document.addEventListener('click',e=>{ if(!e.target.closest('.combo')) closeList(); });
+
+/* ====== FORM ====== */
+let editId = null;
+function setInvalid(f,on,msg){ const el=document.querySelector(`[data-f="${f}"]`); if(!el) return; el.classList.toggle('invalid',on); if(msg){ const er=el.querySelector('.err'); if(er) er.textContent=msg; } }
+function calcHari(){
+  const a=$('#fMulai').value,b=$('#fSelesai').value;
+  $('#fHari').value = (a&&b&&b>=a) ? days(a,b)+' hari' : '';
+}
+['#fMulai','#fSelesai'].forEach(s=>$(s).addEventListener('change',()=>{
+  if(s==='#fMulai' && $('#fMulai').value && (!$('#fSelesai').value || $('#fSelesai').value<$('#fMulai').value)) $('#fSelesai').value=$('#fMulai').value;
+  $('#fSelesai').min = $('#fMulai').value||'';
+  calcHari(); setInvalid('mulai',false); setInvalid('selesai',false); updateSide();
+}));
+$('#fJenis').addEventListener('change',()=>{ setInvalid('jenis',false); updateSide(); });
+$('#fAlasan').addEventListener('input',()=>setInvalid('alasan',false));
+
+function updateSide(){
+  const so=$('#sideOp'), st=$('#sideTeam');
+  if(!selOp){
+    so.innerHTML='<h3>Info Operator</h3><p class="muted" style="margin:0">Pilih operator untuk melihat riwayat dan sisa cuti tahunan.</p>';
+    st.innerHTML='<h3>Dampak ke Team</h3><p class="muted" style="margin:0">Isi operator dan tanggal untuk melihat siapa saja rekan satu team yang juga cuti.</p>';
+    return;
+  }
+  const s = statsOp(selOp.ops);
+  const recent = s.mine.filter(i=>i.id!==editId).sort((a,b)=>b.mulai.localeCompare(a.mulai)).slice(0,4);
+  let html = `<h3>Info Operator</h3>
+    <div class="kv"><span>Nama</span><b>${esc(selOp.nama)}</b><span>Ops ID</span><span style="color:var(--ink)">${esc(selOp.ops)}</span><span>Team</span><span>${teamChip(selOp.team)}</span></div>
+    <div class="quota"><div><b>${store.quota}</b><small>Kuota tahunan ${YEAR}</small></div><div><b>${s.tahunan}</b><small>Terpakai (disetujui)</small></div><div><b style="color:${s.sisa<=2?'var(--bad)':'var(--ok)'}">${s.sisa}</b><small>Sisa</small></div></div>`;
+  if(s.pendTahunan) html += `<div class="alert warn">Ada ${s.pendTahunan} hari cuti tahunan yang masih menunggu persetujuan.</div>`;
+  const a=$('#fMulai').value,b=$('#fSelesai').value;
+  if($('#fJenis').value==='Cuti Tahunan' && a && b && b>=a){
+    const req = daysInYear({mulai:a,selesai:b},YEAR);
+    const editOld = editId ? (store.items.find(i=>i.id===editId&&i.status==='Disetujui'&&i.jenis==='Cuti Tahunan')) : null;
+    const avail = s.sisa + (editOld?daysInYear(editOld,YEAR):0);
+    if(req>avail) html += `<div class="alert bad">Pengajuan ${req} hari melebihi sisa kuota (${avail} hari).</div>`;
+  }
+  html += recent.length ? `<div style="margin-top:10px;font-size:12.5px;font-weight:600">Riwayat terakhir</div><ul class="mini">${recent.map(i=>`<li>${fmt(i.mulai)}${i.selesai!==i.mulai?' – '+fmt(i.selesai):''} · ${esc(i.jenis)} · ${statChip(i.status)}</li>`).join('')}</ul>` : '<p class="muted" style="font-size:12.5px;margin:10px 0 0">Belum ada riwayat cuti.</p>';
+  so.innerHTML = html;
+
+  if(!(a&&b&&b>=a)){ st.innerHTML='<h3>Dampak ke Team</h3><p class="muted" style="margin:0">Isi tanggal mulai dan selesai untuk melihat rekan Team '+esc(selOp.team)+' yang juga cuti.</p>'; return; }
+  const teamOps = OPS.filter(o=>o.team===selOp.team);
+  const others = store.items.filter(i=>i.team===selOp.team && i.ops!==selOp.ops && i.status!=='Ditolak' && i.id!==editId && overlap(a,b,i.mulai,i.selesai));
+  // puncak jumlah cuti per hari di rentang
+  let peak=0, peakDay=a;
+  for(let d=dayNum(a); d<=dayNum(b) && d-dayNum(a)<62; d++){
+    const iso = new Date(d*864e5).toISOString().slice(0,10);
+    const n = new Set(others.filter(i=>i.mulai<=iso&&iso<=i.selesai).map(i=>i.ops)).size + 1;
+    if(n>peak){peak=n;peakDay=iso;}
+  }
+  const avail = Math.round((teamOps.length-peak)/teamOps.length*100);
+  let th = `<h3>Dampak ke Team ${esc(selOp.team)}</h3>
+    <div class="kv"><span>Jumlah operator</span><b>${teamOps.length}</b><span>Cuti terbanyak</span><b>${peak} orang (${fmt(peakDay)})</b><span>Tersedia</span><b>${avail}%</b></div>`;
+  th += others.length ? `<div class="alert ${peak>=Math.max(3,Math.ceil(teamOps.length*0.1))?'warn':'ok'}">${others.length} pengajuan lain di team ini pada rentang tanggal tsb.</div><ul class="mini">${others.slice(0,8).map(i=>`<li>${esc(i.nama)} · ${fmt(i.mulai)}${i.selesai!==i.mulai?' – '+fmt(i.selesai):''} · ${statChip(i.status)}</li>`).join('')}${others.length>8?`<li>…dan ${others.length-8} lainnya</li>`:''}</ul>`
+    : `<div class="alert ok">Tidak ada rekan Team ${esc(selOp.team)} yang cuti di tanggal tsb.</div>`;
+  st.innerHTML = th;
+}
+
+function resetForm(){
+  $('#frm').reset(); selOp=null; editId=null; $('#fOps').value=''; $('#fTeam').value=''; $('#fHari').value=''; $('#fSelesai').min='';
+  document.querySelectorAll('.invalid').forEach(e=>e.classList.remove('invalid'));
+  $('#editBanner').classList.remove('on'); $('#btnSubmit').textContent='Simpan ke List Cuti';
+  updateSide();
+}
+$('#btnReset').onclick = resetForm;
+$('#btnCancelEdit').onclick = resetForm;
+
+$('#frm').addEventListener('submit',e=>{
+  e.preventDefault();
+  let ok = true;
+  const v = {jenis:$('#fJenis').value, mulai:$('#fMulai').value, selesai:$('#fSelesai').value, alasan:$('#fAlasan').value.trim(), status:$('#fStatus').value, hp:$('#fHp').value.trim(), atasan:$('#fAtasan').value.trim()};
+  if(!selOp){ setInvalid('op',true); ok=false; }
+  if(!v.jenis){ setInvalid('jenis',true); ok=false; }
+  if(!v.mulai){ setInvalid('mulai',true,'Isi tanggal mulai.'); ok=false; }
+  if(!v.selesai){ setInvalid('selesai',true,'Isi tanggal selesai.'); ok=false; }
+  else if(v.mulai && v.selesai<v.mulai){ setInvalid('selesai',true,'Tanggal selesai tidak boleh sebelum tanggal mulai.'); ok=false; }
+  if(!v.alasan){ setInvalid('alasan',true); ok=false; }
+  if(ok){
+    const clash = store.items.find(i=>i.ops===selOp.ops && i.id!==editId && i.status!=='Ditolak' && overlap(v.mulai,v.selesai,i.mulai,i.selesai));
+    if(clash){ setInvalid('mulai',true,`Bentrok dengan cuti ${clash.jenis} ${fmt(clash.mulai)} – ${fmt(clash.selesai)} (${clash.status}).`); ok=false; }
+  }
+  if(!ok){ document.querySelector('.invalid input,.invalid select,.invalid textarea')?.focus(); return; }
+  const rec = {...v, ops:selOp.ops, nama:selOp.nama, team:selOp.team, hari:days(v.mulai,v.selesai)};
+  if(editId){
+    const idx = store.items.findIndex(i=>i.id===editId);
+    if(idx>=0) store.items[idx] = {...store.items[idx], ...rec, diubah:new Date().toISOString()};
+    save(); toast(`Data cuti ${rec.nama} diperbarui.`);
+  } else {
+    store.items.push({id:uid(), ...rec, dibuat:new Date().toISOString()});
+    save(); toast(`Cuti ${rec.nama} (${rec.hari} hari) tersimpan di List Cuti.`);
+  }
+  resetForm(); renderAll();
+});
+
+function startEdit(id){
+  const it = store.items.find(i=>i.id===id); if(!it) return;
+  resetForm(); editId = id;
+  const o = opByOps[it.ops] || {ops:it.ops,nama:it.nama,team:it.team};
+  pickOp(o);
+  $('#fJenis').value=it.jenis; $('#fStatus').value=it.status; $('#fMulai').value=it.mulai; $('#fSelesai').value=it.selesai; $('#fSelesai').min=it.mulai;
+  $('#fAlasan').value=it.alasan||''; $('#fHp').value=it.hp||''; $('#fAtasan').value=it.atasan||'';
+  calcHari(); updateSide();
+  $('#editWho').textContent = it.nama; $('#editBanner').classList.add('on'); $('#btnSubmit').textContent='Simpan Perubahan';
+  showTab('form'); window.scrollTo({top:0,behavior:'smooth'});
+}
+function startNewFor(ops){ resetForm(); const o=opByOps[ops]; if(o) pickOp(o); showTab('form'); $('#fJenis').focus(); }
+
+/* ====== LIST ====== */
+function fillSelect(sel, arr){ arr.forEach(x=>{ const o=document.createElement('option'); o.textContent=x; sel.appendChild(o); }); }
+fillSelect($('#lTeam'),TEAMS); fillSelect($('#oTeam'),TEAMS); fillSelect($('#lJenis'),JENIS);
+function filteredList(){
+  const q=norm($('#lq').value), t=$('#lTeam').value, j=$('#lJenis').value, s=$('#lStatus').value, m=$('#lBulan').value;
+  return store.items.filter(i=>{
+    if(t && i.team!==t) return false; if(j && i.jenis!==j) return false; if(s && i.status!==s) return false;
+    if(m && !overlap(m+'-01', m+'-31', i.mulai, i.selesai)) return false;
+    if(q && !norm(`${i.nama} ${i.ops} ${i.alasan} ${i.atasan||''}`).includes(q)) return false;
+    return true;
+  }).sort((a,b)=>b.mulai.localeCompare(a.mulai) || a.team.localeCompare(b.team) || a.nama.localeCompare(b.nama));
+}
+function renderList(){
+  const rows = filteredList();
+  $('#lBody').innerHTML = rows.length ? rows.map((i,n)=>`<tr>
+    <td>${n+1}</td><td>${esc(i.ops)}</td><td><b>${esc(i.nama)}</b>${i.hp?`<div class="muted" style="font-size:11.5px">${esc(i.hp)}</div>`:''}</td><td>${teamChip(i.team)}</td>
+    <td><span class="chip jn">${esc(i.jenis)}</span></td><td>${fmt(i.mulai)}</td><td>${fmt(i.selesai)}</td><td class="num">${i.hari}</td>
+    <td style="max-width:240px">${esc(i.alasan)}${i.atasan?`<div class="muted" style="font-size:11.5px">Atasan: ${esc(i.atasan)}</div>`:''}</td>
+    <td>${statChip(i.status)}</td>
+    <td class="act"><div class="rowact">
+      ${i.status!=='Disetujui'?`<button class="btn sm ok" data-act="ok" data-id="${i.id}">Setujui</button>`:''}
+      ${i.status!=='Ditolak'?`<button class="btn sm bad" data-act="no" data-id="${i.id}">Tolak</button>`:''}
+      <button class="btn sm" data-act="edit" data-id="${i.id}">Ubah</button>
+      <button class="btn sm" data-act="del" data-id="${i.id}" title="Hapus">🗑</button>
+    </div></td></tr>`).join('')
+    : `<tr class="emptyrow"><td colspan="11">${store.items.length?'Tidak ada data yang cocok dengan filter.':'Belum ada data cuti. Tambahkan lewat tab <b>Form Cuti</b>.'}</td></tr>`;
+  const tot = rows.reduce((a,i)=>a+i.hari,0);
+  $('#lInfo').textContent = `${rows.length} dari ${store.items.length} pengajuan · total ${tot} hari`;
+}
+['#lq','#lTeam','#lJenis','#lStatus','#lBulan'].forEach(s=>$(s).addEventListener('input',()=>{ if(s==='#lTeam'){ teamFilter=$('#lTeam').value; renderCards(); } renderList(); }));
+$('#lClear').onclick=()=>{ ['#lq','#lTeam','#lJenis','#lStatus','#lBulan'].forEach(s=>$(s).value=''); teamFilter=''; renderAll(); };
+$('#lBody').addEventListener('click',e=>{
+  const b=e.target.closest('button[data-act]'); if(!b) return;
+  const it=store.items.find(i=>i.id===b.dataset.id); if(!it) return;
+  const act=b.dataset.act;
+  if(act==='edit') return startEdit(it.id);
+  if(act==='del'){
+    const idx=store.items.indexOf(it); store.items.splice(idx,1); save(); renderAll();
+    if(editId===it.id) resetForm();
+    toast(`Cuti ${it.nama} dihapus.`, ()=>{ store.items.splice(idx,0,it); save(); renderAll(); });
+    return;
+  }
+  const prev=it.status, next = act==='ok'?'Disetujui':'Ditolak';
+  if(next==='Disetujui'){
+    const clash = store.items.find(x=>x.ops===it.ops && x.id!==it.id && x.status!=='Ditolak' && overlap(it.mulai,it.selesai,x.mulai,x.selesai));
+    if(clash){ toast(`Tidak bisa disetujui: bentrok dengan cuti lain ${it.nama} (${fmt(clash.mulai)}).`); return; }
+  }
+  it.status=next; save(); renderAll();
+  toast(`Cuti ${it.nama} ${next.toLowerCase()}.`, ()=>{ it.status=prev; save(); renderAll(); });
+});
+
+/* ====== OPERATOR TABLE ====== */
+function renderOps(){
+  const q=norm($('#oq').value), t=$('#oTeam').value, st=$('#oStat').value;
+  const rows = OPS.filter(o=>{
+    if(t && o.team!==t) return false;
+    if(q && !norm(o.nama+' '+o.ops).includes(q)) return false;
+    const c = !!onLeave(o.ops,VIEW);
+    if(st==='cuti'&&!c) return false; if(st==='hadir'&&c) return false;
+    return true;
+  });
+  $('#oBody').innerHTML = rows.length ? rows.map((o,n)=>{
+    const s=statsOp(o.ops), lv=onLeave(o.ops,VIEW);
+    return `<tr><td>${n+1}</td><td>${esc(o.ops)}</td><td><b>${esc(o.nama)}</b></td><td>${teamChip(o.team)}</td>
+      <td class="num">${s.tahunan}</td><td class="num" style="color:${s.sisa<=2?'var(--bad)':'inherit'};font-weight:600">${s.sisa}</td><td class="num">${s.total}</td>
+      <td>${lv?`<span class="chip s-${lv.status}">${esc(lv.jenis)}${lv.status==='Menunggu'?' (menunggu)':''}</span>`:'<span class="muted">—</span>'}</td>
+      <td class="act"><button class="btn sm" data-new="${esc(o.ops)}">+ Cuti</button></td></tr>`;
+  }).join('') : '<tr class="emptyrow"><td colspan="9">Operator tidak ditemukan.</td></tr>';
+  $('#oInfo').textContent = `${rows.length} dari ${OPS.length} operator`;
+}
+['#oq','#oTeam','#oStat'].forEach(s=>$(s).addEventListener('input',()=>{ if(s==='#oTeam'){ teamFilter=$('#oTeam').value; renderCards(); } renderOps(); }));
+$('#oBody').addEventListener('click',e=>{ const b=e.target.closest('button[data-new]'); if(b) startNewFor(b.dataset.new); });
+
+/* ====== SETTINGS ====== */
+$('#setQuota').value = store.quota;
+$('#setQuota').addEventListener('change',()=>{ const v=parseInt($('#setQuota').value,10); store.quota = isNaN(v)||v<0 ? 12 : v; $('#setQuota').value=store.quota; save(); renderAll(); });
+
+/* ====== EXPORT XLSX (tanpa library) ====== */
+const CRC = (()=>{ const t=new Uint32Array(256); for(let n=0;n<256;n++){ let c=n; for(let k=0;k<8;k++) c = c&1 ? 0xEDB88320^(c>>>1) : c>>>1; t[n]=c>>>0; } return t; })();
+function crc32(u8){ let c=0xFFFFFFFF; for(let i=0;i<u8.length;i++) c = CRC[(c^u8[i])&255]^(c>>>8); return (c^0xFFFFFFFF)>>>0; }
+function zip(files){ // files: [{name, data:string}] -> Blob (stored, tanpa kompresi)
+  const enc=new TextEncoder(), parts=[], central=[]; let off=0;
+  for(const f of files){
+    const name=enc.encode(f.name), data=enc.encode(f.data), crc=crc32(data);
+    const lh=new DataView(new ArrayBuffer(30));
+    lh.setUint32(0,0x04034b50,true); lh.setUint16(4,20,true); lh.setUint16(6,0x0800,true); lh.setUint16(8,0,true);
+    lh.setUint16(10,0,true); lh.setUint16(12,0x21,true); lh.setUint32(14,crc,true); lh.setUint32(18,data.length,true); lh.setUint32(22,data.length,true);
+    lh.setUint16(26,name.length,true); lh.setUint16(28,0,true);
+    parts.push(lh.buffer,name,data);
+    const ch=new DataView(new ArrayBuffer(46));
+    ch.setUint32(0,0x02014b50,true); ch.setUint16(4,20,true); ch.setUint16(6,20,true); ch.setUint16(8,0x0800,true); ch.setUint16(10,0,true);
+    ch.setUint16(12,0,true); ch.setUint16(14,0x21,true); ch.setUint32(16,crc,true); ch.setUint32(20,data.length,true); ch.setUint32(24,data.length,true);
+    ch.setUint16(28,name.length,true); ch.setUint32(42,off,true);
+    central.push(ch.buffer,name);
+    off += 30+name.length+data.length;
+  }
+  const csize = central.reduce((a,b)=>a+(b.byteLength),0);
+  const end=new DataView(new ArrayBuffer(22));
+  end.setUint32(0,0x06054b50,true); end.setUint16(8,files.length,true); end.setUint16(10,files.length,true); end.setUint32(12,csize,true); end.setUint32(16,off,true);
+  return new Blob([...parts,...central,end.buffer],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+}
+function xml(s){ return String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])).replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g,''); }
+function colName(i){ let s=''; i++; while(i){ const m=(i-1)%26; s=String.fromCharCode(65+m)+s; i=Math.floor((i-1)/26); } return s; }
+function sheetXml(rows, widths){
+  const body = rows.map((r,ri)=>`<row r="${ri+1}">${r.map((v,ci)=>{
+    const ref=colName(ci)+(ri+1), st = ri===0?' s="1"':'';
+    return typeof v==='number' ? `<c r="${ref}"${st}><v>${v}</v></c>` : `<c r="${ref}" t="inlineStr"${st}><is><t xml:space="preserve">${xml(v)}</t></is></c>`;
+  }).join('')}</row>`).join('');
+  return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetViews><sheetView workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews><cols>${widths.map((w,i)=>`<col min="${i+1}" max="${i+1}" width="${w}" customWidth="1"/>`).join('')}</cols><sheetData>${body}</sheetData><autoFilter ref="A1:${colName(rows[0].length-1)}${rows.length}"/></worksheet>`;
+}
+function buildXlsx(sheets){
+  const ct = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>${sheets.map((s,i)=>`<Override PartName="/xl/worksheets/sheet${i+1}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`).join('')}</Types>`;
+  const rels = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>`;
+  const wb = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets>${sheets.map((s,i)=>`<sheet name="${xml(s.name)}" sheetId="${i+1}" r:id="rId${i+1}"/>`).join('')}</sheets>${sheets.map((s,i)=>`<definedNames><definedName name="_xlnm._FilterDatabase" localSheetId="${i}" hidden="1">'${xml(s.name)}'!$A$1:$${colName(s.rows[0].length-1)}$${s.rows.length}</definedName></definedNames>`).slice(0,0).join('')}</workbook>`;
+  const wbr = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">${sheets.map((s,i)=>`<Relationship Id="rId${i+1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${i+1}.xml"/>`).join('')}<Relationship Id="rId${sheets.length+1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>`;
+  const styles = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts count="2"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><color rgb="FFFFFFFF"/><name val="Calibri"/></font></fonts><fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FFEE4D2D"/><bgColor indexed="64"/></patternFill></fill></fills><borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="2"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1"/></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>`;
+  return zip([
+    {name:'[Content_Types].xml',data:ct},{name:'_rels/.rels',data:rels},{name:'xl/workbook.xml',data:wb},
+    {name:'xl/_rels/workbook.xml.rels',data:wbr},{name:'xl/styles.xml',data:styles},
+    ...sheets.map((s,i)=>({name:`xl/worksheets/sheet${i+1}.xml`,data:sheetXml(s.rows,s.widths)}))
+  ]);
+}
+function download(blob,name){ const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500); }
+$('#btnXlsx').onclick=()=>{
+  const rows = filteredList();
+  const list = [['No','Ops ID','Nama','Team','Jenis Cuti','Tanggal Mulai','Tanggal Selesai','Jumlah Hari','Alasan','Status','No. HP','Atasan'],
+    ...rows.map((i,n)=>[n+1,i.ops,i.nama,i.team,i.jenis,i.mulai,i.selesai,i.hari,i.alasan,i.status,i.hp||'',i.atasan||''])];
+  const rekap = [['Ops ID','Nama','Team',`Cuti Tahunan ${YEAR} (disetujui)`,'Sisa Kuota',`Total Hari Cuti ${YEAR} (disetujui)`,'Jumlah Pengajuan'],
+    ...OPS.map(o=>{ const s=statsOp(o.ops); return [o.ops,o.nama,o.team,s.tahunan,s.sisa,s.total,s.mine.length]; })];
+  const blob = buildXlsx([{name:'List Cuti',rows:list,widths:[5,13,30,10,16,14,14,11,40,12,15,20]},{name:'Rekap Operator',rows:rekap,widths:[13,32,10,22,11,26,17]}]);
+  download(blob,`List Cuti Sunter DC ${TODAY}.xlsx`);
+  toast(`${rows.length} baris diekspor ke Excel.`);
+};
+$('#btnPrint').onclick=()=>{
+  const f=[$('#lTeam').value&&'Team '+$('#lTeam').value,$('#lJenis').value,$('#lStatus').value,$('#lBulan').value&&('Bulan '+$('#lBulan').value)].filter(Boolean).join(' · ');
+  $('#printInfo').textContent = `Dicetak ${fmt(TODAY)}${f?' · Filter: '+f:''}`;
+  showTab('list'); setTimeout(()=>window.print(),100);
+};
+$('#btnBackup').onclick=()=>{ download(new Blob([JSON.stringify(store,null,1)],{type:'application/json'}),`backup-list-cuti-sunter-${TODAY}.json`); toast('File backup diunduh.'); };
+$('#btnRestore').onclick=()=>$('#fileRestore').click();
+$('#fileRestore').onchange=async e=>{
+  const f=e.target.files[0]; if(!f) return;
+  try{
+    const d=JSON.parse(await f.text());
+    if(!d||!Array.isArray(d.items)) throw 0;
+    const ok = d.items.every(i=>i&&i.id&&i.ops&&i.mulai&&i.selesai&&i.status);
+    if(!ok) throw 0;
+    const prev = store; store = {quota: typeof d.quota==='number'?d.quota:12, items:d.items};
+    save(); $('#setQuota').value=store.quota; resetForm(); renderAll();
+    toast(`${d.items.length} data cuti dimuat dari backup.`, ()=>{ store=prev; save(); $('#setQuota').value=store.quota; renderAll(); });
+  }catch(err){ toast('File backup tidak valid.'); }
+  e.target.value='';
+};
+
+/* ====== RENDER ====== */
+/* ====== DASHBOARD ====== */
+const tip = document.createElement('div'); tip.id='tip'; document.body.appendChild(tip);
+document.addEventListener('mousemove',e=>{
+  const t = e.target.closest && e.target.closest('[data-tip]');
+  if(!t){ tip.style.display='none'; return; }
+  tip.innerHTML = t.getAttribute('data-tip'); tip.style.display='block';
+  const r = tip.getBoundingClientRect();
+  let x = e.clientX+14, y = e.clientY+14;
+  if(x+r.width > innerWidth-8) x = e.clientX-r.width-14;
+  if(y+r.height > innerHeight-8) y = e.clientY-r.height-14;
+  tip.style.left=x+'px'; tip.style.top=y+'px';
+});
+function overlapDays(it,s,e){ const a=it.mulai<s?s:it.mulai, b=it.selesai>e?e:it.selesai; return a<=b?days(a,b):0; }
+function addDays(iso,n){ return new Date((dayNum(iso)+n)*864e5).toISOString().slice(0,10); }
+function lastDay(y,m){ return new Date(Date.UTC(y,m,0)).getUTCDate(); }
+function niceMax(v){ const r=v/4; const p=Math.pow(10,Math.floor(Math.log10(Math.max(r,1)))); const n=r/p; const step=Math.max(1,(n<=1?1:n<=2?2:n<=5?5:10)*p); return step*4; }
+function legendHtml(teams){ return teams.map(t=>`<span><i style="background:${TEAM_HEX[t]}"></i>Team ${t}</span>`).join(''); }
+function stackSvg(labels, series, opt={}){
+  const W=Math.max(labels.length*46+40,opt.w||760), H=opt.h||240, pL=34, pR=6, pT=16, pB=opt.twoLine?40:26;
+  const n=labels.length, totals=labels.map((_,i)=>series.reduce((a,s)=>a+s.values[i],0));
+  const max=niceMax(Math.max(1,...totals)), ih=H-pT-pB, cw=(W-pL-pR)/n, bw=Math.min(34,cw*0.6);
+  const y=v=>pT+ih-v/max*ih;
+  let g='';
+  for(let k=0;k<=4;k++){ const v=max/4*k, yy=y(v); g+=`<line x1="${pL}" x2="${W-pR}" y1="${yy}" y2="${yy}" stroke="${k?'#eef0f3':'#d0d5dd'}"/><text x="${pL-6}" y="${yy+4}" text-anchor="end" font-size="11" fill="#98a2b3">${+v.toFixed(1)}</text>`; }
+  labels.forEach((lb,i)=>{
+    const cx=pL+cw*i+cw/2; let acc=0, segs='';
+    const nz = series.filter(s=>s.values[i]>0);
+    nz.forEach((s,j)=>{
+      const v=s.values[i], y0=y(acc), y1=y(acc+v); acc+=v;
+      const top = j===nz.length-1, hgt=Math.max(0,y0-y1-(top?0:2));
+      segs += top ? `<path d="M${cx-bw/2},${y0}V${y1+4}q0,-4 4,-4h${bw-8}q4,0 4,4V${y0}Z" fill="${s.color}"/>`
+                  : `<rect x="${cx-bw/2}" y="${y1+2}" width="${bw}" height="${hgt}" fill="${s.color}"/>`;
+    });
+    const tipTxt = `<b>${opt.tipTitle?opt.tipTitle(i):lb}</b><br>`+series.map(s=>`<span class="dot" style="background:${s.color}"></span>${s.name}: ${s.values[i]} ${opt.unit||''}`).join('<br>')+(series.length>1?`<br>Total: <b>${totals[i]} ${opt.unit||''}</b>`:'');
+    const lines = String(lb).split('\n');
+    g += `<rect class="col" x="${pL+cw*i}" y="${pT}" width="${cw}" height="${ih}" fill="transparent" data-tip="${esc(tipTxt)}"/>`
+      + `<g pointer-events="none">${segs}${totals[i]>0?`<text x="${cx}" y="${y(totals[i])-5}" text-anchor="middle" font-size="11" font-weight="600" fill="#344054">${totals[i]}</text>`:''}</g>`
+      + lines.map((l,k)=>`<text x="${cx}" y="${H-pB+15+k*13}" text-anchor="middle" font-size="11" fill="${opt.hl===i?'#1d2433':'#667085'}" font-weight="${opt.hl===i?700:400}" pointer-events="none">${esc(l)}</text>`).join('');
+  });
+  return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(opt.aria||'grafik')}">${g}</svg>`;
+}
+function hbars(rows, unit){
+  if(!rows.length) return '<p class="muted" style="font-size:12.5px">Belum ada data.</p>';
+  const max=Math.max(...rows.map(r=>r.v));
+  return rows.map(r=>`<div class="hb" data-tip="${esc(`<b>${esc(r.tipT||r.l)}</b><br>${r.v} ${unit}`)}"><span class="lb">${r.lh||esc(r.l)}</span><span class="tr"><i style="width:${Math.max(2,r.v/max*100)}%;background:${r.c||'#5b6b86'}"></i></span><span class="vl">${r.v}</span></div>`).join('');
+}
+function renderDash(){
+  const D=VIEW, Y=+D.slice(0,4), M=+D.slice(5,7);
+  const teams = teamFilter?[teamFilter]:TEAMS;
+  const ops = OPS.filter(o=>teams.includes(o.team));
+  const items = store.items.filter(i=>teams.includes(i.team));
+  const live = items.filter(i=>i.status!=='Ditolak'), appr = items.filter(i=>i.status==='Disetujui');
+  const onD = live.filter(i=>i.mulai<=D&&D<=i.selesai).sort((a,b)=>TEAMS.indexOf(a.team)-TEAMS.indexOf(b.team)||a.nama.localeCompare(b.nama));
+  const opsOnD = new Set(onD.map(i=>i.ops)), apprOnD = new Set(onD.filter(i=>i.status==='Disetujui').map(i=>i.ops));
+  const pend = items.filter(i=>i.status==='Menunggu').length;
+  const ms=`${Y}-${pad(M)}-01`, me=`${Y}-${pad(M)}-${lastDay(Y,M)}`;
+  const monDays = appr.reduce((a,i)=>a+overlapDays(i,ms,me),0);
+  const avail = ops.length-opsOnD.size, pct = ops.length?Math.round(avail/ops.length*100):0;
+  const isToday = D===TODAY, dLbl = isToday?'hari ini':fmt(D);
+  const scope = teamFilter?`Team ${teamFilter}`:'semua team';
+  $('#kpis').innerHTML = [
+    ['Total operator', ops.length, scope],
+    [`Cuti ${dLbl}`, opsOnD.size, `${apprOnD.size} disetujui · ${opsOnD.size-apprOnD.size} menunggu`],
+    [`Tersedia ${dLbl}`, avail, `${pct}% dari total operator`],
+    ['Menunggu persetujuan', pend, 'semua tanggal'],
+    [`Hari cuti ${BLN[M-1]} ${Y}`, monDays, 'hari, yang disetujui'],
+  ].map(([l,v,s])=>`<div class="kpi"><div class="l">${l}</div><div class="v">${v}</div><div class="s">${s}</div></div>`).join('');
+  $('#todayTag').textContent = `· ${isToday?'Hari ini, ':''}${fmt(D)} · ${onD.length} orang`;
+  $('#dToday').innerHTML = onD.length ? onD.map(i=>`<tr><td><b>${esc(i.nama)}</b></td><td>${esc(i.ops)}</td><td>${teamChip(i.team)}</td><td>${esc(i.jenis)}</td><td style="white-space:nowrap">${fmt(i.mulai)}${i.selesai!==i.mulai?' – '+fmt(i.selesai):''}</td><td>${statChip(i.status)}</td></tr>`).join('')
+    : `<tr class="emptyrow"><td colspan="6">Tidak ada operator yang cuti pada ${fmt(D)}.</td></tr>`;
+  $('#availTag').textContent = `· ${fmt(D)}`;
+  $('#dAvail').innerHTML = teams.map(t=>{
+    const to=OPS.filter(o=>o.team===t), c=to.filter(o=>opsOnD.has(o.ops)).length, p=Math.round((to.length-c)/to.length*100);
+    return `<div style="margin-bottom:14px" data-tip="${esc(`<b>Team ${t}</b><br>Tersedia: ${to.length-c} dari ${to.length}<br>Cuti: ${c} orang`)}">
+      <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px"><span><span class="dot" style="background:${TEAM_HEX[t]}"></span><b>Team ${t}</b></span><span><b>${to.length-c}</b><span class="muted"> / ${to.length} tersedia · ${c} cuti</span></span></div>
+      <div class="tr" style="height:14px;background:#f2f4f7;border-radius:4px;overflow:hidden"><i style="display:block;height:100%;width:${p}%;background:${TEAM_HEX[t]};border-radius:0 4px 4px 0"></i></div>
+      <div style="font-size:12px;color:var(--muted);margin-top:3px">${p}% tersedia</div></div>`;
+  }).join('');
+  // 14 hari
+  const d14 = Array.from({length:14},(_,k)=>addDays(D,k));
+  $('#lg14').innerHTML = legendHtml(teams);
+  $('#c14').innerHTML = stackSvg(d14.map(d=>{ const x=new Date(dayNum(d)*864e5); return `${HARI[x.getUTCDay()].slice(0,3)}\n${+d.slice(8)} ${BLN[+d.slice(5,7)-1]}`; }),
+    teams.map(t=>({name:'Team '+t,color:TEAM_HEX[t],values:d14.map(d=>new Set(live.filter(i=>i.team===t&&i.mulai<=d&&d<=i.selesai).map(i=>i.ops)).size)})),
+    {w:$('#c14').clientWidth-2,twoLine:true,unit:'orang',hl:0,tipTitle:i=>`${HARI[new Date(dayNum(d14[i])*864e5).getUTCDay()]}, ${fmt(d14[i])}`,aria:'Jumlah operator cuti 14 hari ke depan per team'});
+  // per bulan
+  $('#yearTag').textContent = $('#yearTag2').textContent = `· ${Y}`;
+  $('#lgMon').innerHTML = legendHtml(teams);
+  const months = Array.from({length:12},(_,k)=>[`${Y}-${pad(k+1)}-01`,`${Y}-${pad(k+1)}-${lastDay(Y,k+1)}`]);
+  $('#cMon').innerHTML = stackSvg(BLN, teams.map(t=>({name:'Team '+t,color:TEAM_HEX[t],values:months.map(([s,e])=>appr.filter(i=>i.team===t).reduce((a,i)=>a+overlapDays(i,s,e),0))})),
+    {w:$('#cMon').clientWidth-2,h:230,unit:'hari',hl:M-1,tipTitle:i=>`${BLN[i]} ${Y}`,aria:'Hari cuti per bulan per team'});
+  const ys=`${Y}-01-01`, ye=`${Y}-12-31`;
+  $('#cJenis').innerHTML = hbars(JENIS.map(j=>({l:j,v:appr.filter(i=>i.jenis===j).reduce((a,i)=>a+overlapDays(i,ys,ye),0)})).filter(r=>r.v>0).sort((a,b)=>b.v-a.v),'hari');
+  const per={}; appr.forEach(i=>{ const v=overlapDays(i,ys,ye); if(v) per[i.ops]=(per[i.ops]||0)+v; });
+  $('#cTop').innerHTML = hbars(Object.entries(per).sort((a,b)=>b[1]-a[1]).slice(0,10).map(([o,v])=>{ const op=opByOps[o]||{nama:o,team:''}; return {l:op.nama,lh:`${esc(op.nama)} <span class="muted" style="font-size:11px">· ${esc(op.team)}</span>`,tipT:`${op.nama} (${o}) · Team ${op.team}`,v,c:TEAM_HEX[op.team]}; }),'hari');
+  // banner
+  const nDemo = store.items.filter(i=>i.demo).length;
+  $('#dashBanner').innerHTML = !store.items.length
+    ? `<div class="banner"><div class="txt"><b>Belum ada data cuti.</b> Masukkan data aktual dari FMS dengan <b>Import Excel/CSV</b>, isi satu per satu lewat <b>Form Cuti</b>, atau coba tampilan dengan data contoh.</div><button class="btn primary" data-dash="import">⬆ Import Excel/CSV FMS</button><button class="btn" data-dash="form">📝 Isi Form Cuti</button><button class="btn" data-dash="demo">Coba data contoh</button></div>`
+    : nDemo ? `<div class="banner demo"><div class="txt">⚠️ <b>Sedang menampilkan ${nDemo} data contoh</b> (bukan data cuti asli). Hapus sebelum memasukkan data aktual dari FMS.</div><button class="btn" data-dash="cleardemo">Hapus data contoh</button><button class="btn" data-dash="import">⬆ Import Excel/CSV FMS</button></div>`
+    : `<div class="banner" style="border-style:solid;border-color:var(--line)"><div class="txt muted">Update data dari FMS: ekspor data cuti ke Excel/CSV, lalu import. Data yang sudah ada tidak dobel.</div><button class="btn" data-dash="import">⬆ Import Excel/CSV FMS</button></div>`;
+  if(lastImport) $('#dashBanner .txt').insertAdjacentHTML('beforeend', `<div class="impres">${lastImport}</div>`);
+}
+let lastImport='';
+$('#dashBanner').addEventListener('click',e=>{
+  const b=e.target.closest('[data-dash]'); if(!b) return;
+  const a=b.dataset.dash;
+  if(a==='import') $('#fileImport').click();
+  if(a==='form') showTab('form');
+  if(a==='demo'){ makeDemo(); save(); renderAll(); toast('Data contoh dimuat.'); }
+  if(a==='cleardemo'){ const prev=store.items.slice(); store.items=store.items.filter(i=>!i.demo); save(); renderAll(); toast('Data contoh dihapus.',()=>{ store.items=prev; save(); renderAll(); }); }
+});
+function makeDemo(){
+  let seed=7; const rnd=()=>{ seed=(seed*16807)%2147483647; return (seed-1)/2147483646; };
+  const pick=a=>a[Math.floor(rnd()*a.length)];
+  const jw=['Cuti Tahunan','Cuti Tahunan','Cuti Tahunan','Sakit','Sakit','Izin','Izin','Cuti Khusus'];
+  const why={'Cuti Tahunan':['Acara keluarga','Pulang kampung','Keperluan pribadi'],'Sakit':['Demam, ada surat dokter','Sakit perut'],'Izin':['Urus dokumen','Keperluan keluarga'],'Cuti Khusus':['Pernikahan saudara','Istri melahirkan']};
+  const add=(o,s,len,status)=>{ const e=addDays(s,len-1);
+    if(store.items.some(i=>i.ops===o.ops&&i.status!=='Ditolak'&&overlap(s,e,i.mulai,i.selesai))) return;
+    const j=pick(jw); store.items.push({id:uid(),ops:o.ops,nama:o.nama,team:o.team,jenis:j,mulai:s,selesai:e,hari:len,alasan:pick(why[j]),status,hp:'',atasan:'',demo:true,dibuat:new Date().toISOString()}); };
+  for(let k=0;k<7;k++) add(pick(OPS), addDays(VIEW,-Math.floor(rnd()*2)), 1+Math.floor(rnd()*3), 'Disetujui');
+  for(let k=0;k<2;k++) add(pick(OPS), VIEW, 1+Math.floor(rnd()*2), 'Menunggu');
+  for(let k=0;k<70;k++){ const off=-Math.floor(rnd()*300); const s=addDays(VIEW,off); if(s.slice(0,4)!==VIEW.slice(0,4)) continue; add(pick(OPS), s, 1+Math.floor(rnd()*3), rnd()<.9?'Disetujui':'Ditolak'); }
+  for(let k=0;k<16;k++) add(pick(OPS), addDays(VIEW,1+Math.floor(rnd()*13)), 1+Math.floor(rnd()*3), rnd()<.5?'Disetujui':'Menunggu');
+}
+
+/* ====== IMPORT EXCEL / CSV (data FMS) ====== */
+async function inflate(u8){ const ds=new DecompressionStream('deflate-raw'); return new Uint8Array(await new Response(new Blob([u8]).stream().pipeThrough(ds)).arrayBuffer()); }
+async function unzip(buf){
+  const dv=new DataView(buf), u8=new Uint8Array(buf), out={}; let eo=-1;
+  for(let p=buf.byteLength-22;p>=Math.max(0,buf.byteLength-66000);p--) if(dv.getUint32(p,true)===0x06054b50){eo=p;break;}
+  if(eo<0) throw new Error('Bukan file Excel yang valid');
+  let p=dv.getUint32(eo+16,true); const cnt=dv.getUint16(eo+10,true), td=new TextDecoder();
+  for(let k=0;k<cnt;k++){
+    const m=dv.getUint16(p+10,true), cs=dv.getUint32(p+20,true), nl=dv.getUint16(p+28,true), el=dv.getUint16(p+30,true), cl=dv.getUint16(p+32,true), lo=dv.getUint32(p+42,true);
+    const name=td.decode(u8.subarray(p+46,p+46+nl)); p+=46+nl+el+cl;
+    out[name]=async()=>{ const s=lo+30+dv.getUint16(lo+26,true)+dv.getUint16(lo+28,true); const d=u8.subarray(s,s+cs); return td.decode(m===8?await inflate(d):d); };
+  }
+  return out;
+}
+async function readXlsx(buf){
+  const z=await unzip(buf), P=new DOMParser(), NS='http://schemas.openxmlformats.org/spreadsheetml/2006/main';
+  const ss=[]; if(z['xl/sharedStrings.xml']){ const d=P.parseFromString(await z['xl/sharedStrings.xml'](),'application/xml'); for(const si of d.getElementsByTagNameNS(NS,'si')) ss.push([...si.getElementsByTagNameNS(NS,'t')].map(t=>t.textContent).join('')); }
+  const names=Object.keys(z).filter(n=>/^xl\/worksheets\/sheet\d+\.xml$/.test(n)).sort((a,b)=>parseInt(a.match(/\d+/))-parseInt(b.match(/\d+/)));
+  const sheets=[];
+  for(const n of names){
+    const d=P.parseFromString(await z[n](),'application/xml'), rows=[];
+    for(const r of d.getElementsByTagNameNS(NS,'row')){
+      const row=[];
+      for(const c of r.getElementsByTagNameNS(NS,'c')){
+        const ref=c.getAttribute('r')||''; let ci=0; for(const ch of ref.replace(/\d/g,'')) ci=ci*26+ch.charCodeAt(0)-64; ci=ci?ci-1:row.length;
+        const t=c.getAttribute('t'), v=c.getElementsByTagNameNS(NS,'v')[0]?.textContent;
+        let val = t==='s'?ss[+v]: t==='inlineStr'?[...c.getElementsByTagNameNS(NS,'t')].map(x=>x.textContent).join(''): t==='str'||t==='b'?v: (v!=null&&v!==''?+v:'');
+        row[ci]=val??'';
+      }
+      rows.push(row);
+    }
+    sheets.push(rows);
+  }
+  return sheets;
+}
+function readCsv(txt){
+  txt=txt.replace(/^﻿/,''); const first=txt.split(/\r?\n/)[0]||'';
+  const dl=[',',';','\t'].sort((a,b)=>first.split(b).length-first.split(a).length)[0];
+  const rows=[]; let row=[], cur='', q=false;
+  for(let i=0;i<txt.length;i++){ const ch=txt[i];
+    if(q){ if(ch==='"'){ if(txt[i+1]==='"'){cur+='"';i++;} else q=false; } else cur+=ch; }
+    else if(ch==='"') q=true; else if(ch===dl){ row.push(cur); cur=''; }
+    else if(ch==='\n'||ch==='\r'){ if(ch==='\r'&&txt[i+1]==='\n') i++; row.push(cur); rows.push(row); row=[]; cur=''; }
+    else cur+=ch; }
+  if(cur||row.length){ row.push(cur); rows.push(row); }
+  return [rows];
+}
+const MON = {jan:1,feb:2,mar:3,apr:4,mei:5,may:5,jun:6,jul:7,agu:8,agt:8,aug:8,sep:9,okt:10,oct:10,nov:11,des:12,dec:12};
+function parseDate(v){
+  if(v===''||v==null) return null;
+  if(typeof v==='number' || /^\d{5}(\.\d+)?$/.test(String(v).trim())){ const n=+v; if(n>20000&&n<80000) return new Date(Date.UTC(1899,11,30)+Math.floor(n)*864e5).toISOString().slice(0,10); return null; }
+  const s=String(v).trim().toLowerCase(); let m;
+  const ok=(y,mo,d)=>{ y=+y; if(y<100) y+=2000; if(mo<1||mo>12||d<1||d>31) return null; return `${y}-${pad(mo)}-${pad(d)}`; };
+  if((m=s.match(/^(\d{4})[-\/.](\d{1,2})[-\/.](\d{1,2})/))) return ok(m[1],+m[2],+m[3]);
+  if((m=s.match(/^(\d{1,2})[-\/.](\d{1,2})[-\/.](\d{2,4})/))) return ok(m[3],+m[2],+m[1]);
+  if((m=s.match(/^(\d{1,2})[\s-]+([a-z]{3})[a-z]*[\s-]+(\d{2,4})/)) && MON[m[2]]) return ok(m[3],MON[m[2]],+m[1]);
+  return null;
+}
+function splitRange(v){ if(typeof v!=='string') return [v]; const p=v.split(/\s+-\s+|\s*–\s*|\s+s\.?\s*d\.?\s+|\s+sampai\s+|\s+to\s+/i); return p.length>1?[p[0],p[p.length-1]]:[v]; }
+function mapJenis(t){ t=String(t||'').toLowerCase();
+  if(/sakit|sick|\bsd\b/.test(t)) return 'Sakit'; if(/melahir|maternity/.test(t)) return 'Cuti Melahirkan'; if(/tanpa|unpaid/.test(t)) return 'Cuti Tanpa Gaji';
+  if(/khusus|nikah|duka|special/.test(t)) return 'Cuti Khusus'; if(/izin|ijin|permit/.test(t)) return 'Izin'; return 'Cuti Tahunan'; }
+function mapStatus(t){ t=String(t||'').toLowerCase(); if(/tolak|reject|decline|batal|cancel/.test(t)) return 'Ditolak'; if(/tunggu|pending|wait|submit|proses|review/.test(t)) return 'Menunggu'; return 'Disetujui'; }
+function detectCols(h){
+  const c={}; h.forEach((x,i)=>{ const s=norm(String(x??'')); if(!s) return;
+    const set=(k)=>{ if(c[k]==null) c[k]=i; };
+    if(/^(ops|ops ?id|id ops|ops id fms|nik|staff id|employee id|id karyawan|fms id|id)$/.test(s)||/^ops\b/.test(s)) set('ops');
+    else if(/nama|name/.test(s)) set('nama');
+    else if(/^(team|tim|grup|group)\b/.test(s)) set('team');
+    else if(/selesai|end|sampai|akhir|until|to date/.test(s)) set('selesai');
+    else if(/mulai|start|dari|from|awal/.test(s)) set('mulai');
+    else if(/tanggal|tgl|date|periode/.test(s)) set('tanggal');
+    else if(/status|approval/.test(s)) set('status');
+    else if(/jenis|tipe|type|kategori|leave/.test(s)) set('jenis');
+    else if(/alasan|reason|keterangan|ket\b|catatan|note|remark|remaks/.test(s)) set('alasan');
+  });
+  return c;
+}
+const opByName = {}; OPS.forEach(o=>{ opByName[norm(o.nama)]=o; });
+async function importFile(f){
+  const buf=await f.arrayBuffer();
+  const sheets = /\.csv$|\.txt$/i.test(f.name) ? readCsv(new TextDecoder().decode(buf)) : await readXlsx(buf);
+  const res={add:[],dup:0,clash:0,unknown:new Set(),bad:0};
+  for(const rows of sheets){
+    let hi=-1, c=null;
+    for(let r=0;r<Math.min(15,rows.length);r++){ const d=detectCols(rows[r]||[]); if((d.ops!=null||d.nama!=null)&&(d.mulai!=null||d.tanggal!=null)){ hi=r; c=d; break; } }
+    if(hi<0) continue;
+    for(const row of rows.slice(hi+1)){
+      if(!row) continue;
+      const g=k=>c[k]!=null?row[c[k]]:'';
+      const opsTxt=String(g('ops')).trim(), namaTxt=String(g('nama')).trim();
+      if(!opsTxt&&!namaTxt) continue;
+      const o = opByOps[Object.keys(opByOps).find(k=>k.toLowerCase()===opsTxt.toLowerCase())] || opByName[norm(namaTxt)];
+      if(!o){ res.unknown.add(namaTxt||opsTxt); continue; }
+      let a,b;
+      if(c.mulai!=null){ a=parseDate(g('mulai')); b=parseDate(g('selesai'))||a; }
+      else { const [x,y]=splitRange(g('tanggal')); a=parseDate(x); b=y!==undefined?parseDate(y):a; if(c.selesai!=null&&parseDate(g('selesai'))) b=parseDate(g('selesai')); }
+      if(!a||!b||b<a){ res.bad++; continue; }
+      const jenisSrc = c.jenis!=null?g('jenis'):g('alasan');
+      const rec={id:uid(),ops:o.ops,nama:o.nama,team:o.team,jenis:mapJenis(jenisSrc),mulai:a,selesai:b,hari:days(a,b),alasan:String(g('alasan')||g('jenis')||'Import FMS').trim(),status:c.status!=null?mapStatus(g('status')):'Disetujui',hp:'',atasan:'',sumber:'Import '+f.name,dibuat:new Date().toISOString()};
+      const pool=[...store.items.filter(i=>!i.demo),...res.add];
+      if(pool.some(i=>i.ops===rec.ops&&i.mulai===rec.mulai&&i.selesai===rec.selesai)){ res.dup++; continue; }
+      if(rec.status!=='Ditolak'&&pool.some(i=>i.ops===rec.ops&&i.status!=='Ditolak'&&overlap(rec.mulai,rec.selesai,i.mulai,i.selesai))){ res.clash++; continue; }
+      res.add.push(rec);
+    }
+  }
+  return res;
+}
+const fi=document.createElement('input'); fi.type='file'; fi.id='fileImport'; fi.accept='.xlsx,.csv,.txt'; fi.hidden=true; document.body.appendChild(fi);
+fi.onchange=async e=>{
+  const f=e.target.files[0]; e.target.value=''; if(!f) return;
+  try{
+    const r=await importFile(f);
+    if(!r.add.length && !r.dup && !r.clash && !r.unknown.size && !r.bad){ toast('Kolom tidak dikenali. File perlu kolom Ops/Nama dan Tanggal.'); return; }
+    const prev=store.items.slice();
+    const hadDemo = store.items.some(i=>i.demo);
+    if(r.add.length && hadDemo) store.items=store.items.filter(i=>!i.demo);
+    store.items.push(...r.add); save();
+    const unk=[...r.unknown];
+    lastImport = `<b>Import ${esc(f.name)}:</b> ${r.add.length} data cuti masuk`+(hadDemo&&r.add.length?' (data contoh dihapus)':'')+(r.dup?` · ${r.dup} sudah ada`:'')+(r.clash?` · ${r.clash} bentrok tanggal`:'')+(r.bad?` · ${r.bad} tanggal tidak terbaca`:'')
+      +(unk.length?` · ${unk.length} nama tidak ada di data operator: ${esc(unk.slice(0,6).join(', '))}${unk.length>6?', …':''}`:'');
+    renderAll(); showTab('dash');
+    toast(`${r.add.length} data cuti diimport.`, r.add.length?()=>{ store.items=prev; lastImport=''; save(); renderAll(); }:null);
+  }catch(err){ toast('Gagal membaca file: '+(err.message||err)); }
+};
+
+function renderAll(){ renderCards(); renderDash(); renderList(); renderOps(); updateSide(); }
+$('#viewDate').value=VIEW;
+$('#viewDate').addEventListener('change',()=>{ VIEW=$('#viewDate').value||TODAY; $('#viewDate').value=VIEW; renderAll(); });
+let rzT; window.addEventListener('resize',()=>{ clearTimeout(rzT); rzT=setTimeout(renderDash,150); });
+document.querySelector('.tab[data-tab=dash]').addEventListener('click',()=>setTimeout(renderDash,0));
+$('#btnToday').onclick=()=>{ VIEW=TODAY; $('#viewDate').value=VIEW; renderAll(); };
+renderAll();
+window.addEventListener('storage',e=>{ if(e.key===KEY){ store=load(); renderAll(); } });
+</script>
+</body>
+</html>
