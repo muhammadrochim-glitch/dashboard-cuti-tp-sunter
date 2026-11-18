@@ -1,0 +1,27 @@
+name: Pasang dashboard
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/pasang-dashboard.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  pasang:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Unduh dashboard
+        run: |
+          curl -fsSL -o index.html 'https://sg.migoo.ai/beeai/api/v1/media/signed/budee/2026/11/19/816a4120.html?expires=1795044986&sig=26765abdebdda5a18e3063a133964bcd98f7035a4aa862fcf3d64e543dd38336'
+          echo '31f45cecd97ee557df742ebdbc41194c717ee2768495a592be6dae1b999d1b65  index.html' | sha256sum -c -
+          touch .nojekyll
+      - name: Commit
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git rm -q --cached .github/workflows/pasang-dashboard.yml
+          rm .github/workflows/pasang-dashboard.yml
+          git add index.html .nojekyll
+          git commit -m 'Pasang Dashboard Cuti Operator TP Sunter'
+          git push
